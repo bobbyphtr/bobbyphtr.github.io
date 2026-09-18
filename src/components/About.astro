@@ -1,0 +1,100 @@
+---
+---
+
+<section id="about" class="about">
+  <div class="container">
+    <div class="split">
+      <div class="photo-wrap">
+        <img
+          src="/images/about.jpg"
+          alt="Bobby Pehtrus"
+          width="623"
+          height="900"
+          loading="lazy"
+        />
+      </div>
+      <div class="content">
+        <div class="section-head">
+          <p class="kicker">About</p>
+          <h2 class="section-title">Engineer by trade, health-tech by direction.</h2>
+        </div>
+        <div class="prose">
+          <p>
+            I'm Bobby — an experienced iOS developer with a track record of
+            improving both developer experience and user experience, promoting
+            app quality and visibility through tooling and automation.
+          </p>
+          <p>
+            Across Traveloka and GetGo, I shipped consumer products at scale —
+            core mobile infrastructure, SwiftUI modernization, vehicle
+            telematics, and cloud observability. That grounding in dependable,
+            mass-market software is what I bring to health: patients can't wait
+            for systems that crash.
+          </p>
+          <p>
+            Now a Master's student at NTU in Smart Medicine &amp; Health
+            Informatics, I'm applying AI to clinical and public-health problems —
+            on-device triage, population monitoring, edge AI that works even
+            offline, even in a crisis.
+          </p>
+          <p class="sig">
+            Off the clock? I love to travel, and I would gladly walk a long way
+            for a good coffee.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) 7fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .photo-wrap {
+    max-width: 300px;
+    align-self: start;
+  }
+
+  .photo-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    border: 2px solid var(--accent);
+    padding: 4px;
+    background: var(--surface);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .prose {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .prose p {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .sig {
+    padding-top: 0.5rem;
+    color: var(--text) !important;
+    font-style: italic;
+  }
+
+  @media (max-width: 720px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .photo-wrap {
+      max-width: 320px;
+    }
+  }
+</style>
