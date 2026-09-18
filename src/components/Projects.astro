@@ -1,0 +1,144 @@
+---
+const projects = [
+  {
+    title: "DeepFont — Font Recognition with Deep Learning",
+    subtitle: "Undergraduate thesis",
+    description:
+      "A deep learning font classifier built with a CNN + autoencoder pipeline, reaching 80% training accuracy. Explores how learned representations can identify typefaces directly from rendered glyphs.",
+    tags: ["Python", "Deep Learning", "CNN", "AutoEncoder"],
+    image: "/deepfont.png",
+    imageAlt: "DeepFont project banner",
+    href: "https://github.com/bobbyphtr/DeepFont-FontRecognition",
+  },
+];
+---
+
+<section id="projects" class="projects">
+  <div class="container">
+    <div class="section-head">
+      <p class="kicker">Projects</p>
+      <h2 class="section-title">Things I've built.</h2>
+    </div>
+    <div class="grid">
+      {
+        projects.map((p) => (
+          <a class="card" href={p.href} target="_blank" rel="noreferrer">
+            <div class="banner-wrap">
+              <img class="banner" src={p.image} alt={p.imageAlt} loading="lazy" />
+            </div>
+            <div class="meta">
+              <h3 class="title">{p.title}</h3>
+              <p class="subtitle">{p.subtitle}</p>
+            </div>
+            <p class="description">{p.description}</p>
+            <div class="tags">
+              {p.tags.map((t) => <span class="tag">{t}</span>)}
+            </div>
+          </a>
+        ))
+      }
+    </div>
+    <p class="note">
+      More projects to come as the current research direction matures.
+    </p>
+  </div>
+</section>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+
+  .grid:has(.card:only-child) {
+    grid-template-columns: 1fr;
+    max-width: 640px;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .card:hover {
+    border-color: rgba(183, 166, 240, 0.45);
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+
+  .banner-wrap {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background: #0c1210;
+  }
+
+  .banner {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover .banner {
+    transform: scale(1.04);
+  }
+
+  .meta {
+    padding: 1.4rem 1.7rem 0;
+  }
+
+  .title {
+    margin: 0 0 0.25rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .description {
+    margin: 1rem 1.7rem 1.4rem;
+    color: var(--muted);
+    font-size: 0.98rem;
+    flex: 1;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0 1.7rem 1.4rem;
+  }
+
+  .tag {
+    padding: 0.25rem 0.7rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .note {
+    margin: 1.5rem 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .grid,
+    .grid:has(.card:only-child) {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

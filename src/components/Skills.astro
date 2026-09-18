@@ -1,0 +1,123 @@
+---
+const skills = [
+  { name: "iOS Development", level: 90, note: "Swift · Objective-C · UIKit · App Store submission" },
+  { name: "SwiftUI", level: 85, note: "Modern UI · state management · testing (UT/UIT)" },
+  { name: "Kotlin Multiplatform", level: 70, note: "Shared code across iOS & Android" },
+  { name: "Testing & CI", level: 70, note: "Unit/UI tests · Jenkins · Cocoapods" },
+  { name: "Cloud & Observability", level: 65, note: "AWS EC2/Lambda · Datadog · analytics" },
+  { name: "Python & ML", level: 60, note: "Deep learning · edge AI · current coursework" },
+  { name: "Leadership", level: 75, note: "Stakeholder mgmt · docs · tech adoption" },
+];
+---
+
+<section id="skills" class="skills">
+  <div class="container">
+    <div class="section-head">
+      <p class="kicker">Skills</p>
+      <h2 class="section-title">What I work with.</h2>
+    </div>
+    <div class="bars">
+      {
+        skills.map((s, i) => (
+          <div class="bar-row">
+            <div class="bar-head">
+              <span class="bar-name">{s.name}</span>
+              <span class="bar-note">{s.note}</span>
+              <span class="bar-value">{s.level}%</span>
+            </div>
+            <div class="bar-track">
+              <div
+                class="bar-fill"
+                data-target={`${s.level}%`}
+              ></div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .bars {
+    display: grid;
+    gap: 1.4rem;
+  }
+
+  .bar-row {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .bar-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .bar-name {
+    font-weight: 600;
+    font-size: 1rem;
+    min-width: 11rem;
+  }
+
+  .bar-note {
+    color: var(--muted);
+    font-size: 0.85rem;
+    flex: 1;
+  }
+
+  .bar-value {
+    color: var(--accent);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .bar-track {
+    height: 10px;
+    border-radius: 999px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    width: 0;
+    transition: width 1s ease 0.2s;
+    background: linear-gradient(90deg, var(--accent), var(--mint));
+  }
+
+  @media (max-width: 640px) {
+    .bar-head {
+      flex-wrap: wrap;
+    }
+
+    .bar-name {
+      min-width: 100%;
+    }
+
+    .bar-note {
+      order: 3;
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  const fill = document.querySelectorAll(".bar-fill");
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          const el = e.target;
+          el.style.width = el.dataset.target;
+          io.unobserve(el);
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
+  fill.forEach((el) => io.observe(el));
+</script>
