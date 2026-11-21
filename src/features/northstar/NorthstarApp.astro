@@ -1,0 +1,45 @@
+---
+// North Star — career compass (Overview & Target JD, Focus Compass, Projects).
+// Shell, shared UI and sync come from the app kit; this file supplies the app's
+// own CSS/JS, default blueprint and extra dialogs.
+import AppShell from "../../shared/app-kit/AppShell.astro";
+import css from "./northstar.css?raw";
+import js from "./northstar.js?raw";
+import defaultState from "./default-state.json";
+---
+
+<AppShell
+  title="North Star · Career & Study Compass"
+  appName="North Star"
+  appSub="Career & Study Compass"
+  mark="✦"
+  nav={[
+    { id: "overview", label: "Overview & Target JD" },
+    { id: "compass", label: "Focus Compass" },
+    { id: "projects", label: "Projects" },
+  ]}
+  crossLink={{ href: "../glossary/index.html", label: "Mandarin Glossary" }}
+  extraTools={[{ action: "export-md", label: "Markdown snapshot" }]}
+  css={css}
+  js={js}
+  defaultState={defaultState}
+>
+  <Fragment slot="dialogs">
+    <dialog class="modal modal-wide" id="project-modal" aria-label="Project">
+      <div id="project-body"></div>
+    </dialog>
+
+    <dialog class="modal modal-wide" id="md-modal">
+      <form method="dialog">
+        <h2>Markdown snapshot</h2>
+        <p class="muted">NORTH_STAR_SNAPSHOT.md — paste into Obsidian, Gemini Notebooks or CLAUDE.md.</p>
+        <textarea id="md-output" class="md-output" readonly rows="16"></textarea>
+        <div class="modal-actions">
+          <button class="btn btn-ghost" value="close">Close</button>
+          <button class="btn btn-ghost" type="button" data-action="download-md">Download .md</button>
+          <button class="btn btn-primary" type="button" data-action="copy-md">Copy</button>
+        </div>
+      </form>
+    </dialog>
+  </Fragment>
+</AppShell>

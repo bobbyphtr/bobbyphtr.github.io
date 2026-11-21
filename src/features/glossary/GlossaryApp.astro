@@ -1,0 +1,24 @@
+---
+// Mandarin Glossary — vocab with pinyin, spaced-repetition review and markdown-table import.
+// Shell, shared UI and sync come from the app kit.
+import AppShell from "../../shared/app-kit/AppShell.astro";
+import css from "./glossary.css?raw";
+import js from "./glossary.js?raw";
+import defaultState from "./default-state.json";
+---
+
+<AppShell
+  title="Mandarin Glossary"
+  appName="Mandarin Glossary"
+  appSub="Clinical, tech & daily words"
+  mark="文"
+  nav={[
+    { id: "review", label: "Review" },
+    { id: "words", label: "Words" },
+    { id: "import", label: "Import" },
+  ]}
+  crossLink={{ href: "../northstar/index.html", label: "North Star" }}
+  css={css}
+  js={js}
+  defaultState={defaultState}
+/>

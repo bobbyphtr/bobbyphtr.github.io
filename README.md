@@ -48,17 +48,37 @@ Hosted on **GitHub Pages** via GitHub Actions.
 
 ## Structure
 
+Code is grouped by feature; `src/pages/` only holds thin routes.
+
 ```
 src/
-  layouts/Layout.astro      # head, nav, footer
-  components/               # Hero, About, Experience, Projects, Skills, Contact
-  pages/index.astro         # composes the above into one page
-  styles/global.css         # design tokens + base styles
+  pages/
+    index.astro                       # → features/portfolio/PortfolioPage.astro
+    northstar/index.astro             # → features/northstar/NorthstarApp.astro
+    northstar/default-state.json.ts   # publishes the North Star blueprint JSON
+    glossary/index.astro              # → features/glossary/GlossaryApp.astro
+  features/
+    portfolio/                        # the main site (/)
+      PortfolioPage.astro             # composes the sections into one page
+      layouts/Layout.astro            # head, nav, footer
+      components/                     # Hero, About, Experience, Projects, Skills, Contact
+      styles/global.css               # design tokens + base styles
+    northstar/                        # Career & Study Compass (/northstar/) — see its README
+    glossary/                         # Mandarin Glossary (/glossary/) — see its README
+  shared/
+    app-kit/                          # shell, UI kit, localStorage + GitHub sync for the mini-apps
 public/
   images/                   # hero (profile.jpg) + about (about.jpg) photos
   logos/                    # company/university logos (200×200 normalized)
   deepfont.png              # DeepFont project banner
 ```
+
+## Personal mini-apps
+
+Self-contained, offline-capable pages that share `src/shared/app-kit/`. Data lives in the browser's `localStorage`, with optional sync to a private GitHub repo and JSON backup/restore.
+
+- **North Star (`/northstar/`)**: career compass with a Target JD gap check, focus filter and a project Kanban. See [`src/features/northstar/README.md`](src/features/northstar/README.md).
+- **Mandarin Glossary (`/glossary/`)**: vocabulary with pinyin, spaced-repetition review and markdown-table import. See [`src/features/glossary/README.md`](src/features/glossary/README.md).
 
 ## Content notes
 

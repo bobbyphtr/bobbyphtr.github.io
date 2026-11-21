@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 2,
+  "identity": {
+    "owner": "",
+    "location": "",
+    "program": "",
+    "track": "",
+    "experience": "",
+    "dna": "",
+    "targetIdentity": "",
+    "valueProp": "",
+    "postGradPlan": ""
+  },
+  "pillars": [
+    {
+      "id": "gold",
+      "tier": "Gold",
+      "title": "",
+      "role": "",
+      "weight": 0,
+      "description": ""
+    },
+    {
+      "id": "silver",
+      "tier": "Silver",
+      "title": "",
+      "role": "",
+      "weight": 0,
+      "description": ""
+    },
+    {
+      "id": "bronze",
+      "tier": "Bronze",
+      "title": "",
+      "role": "",
+      "weight": 0,
+      "description": ""
+    }
+  ],
+  "buildPillars": [
+    {
+      "id": "bp1",
+      "title": "",
+      "description": ""
+    },
+    {
+      "id": "bp2",
+      "title": "",
+      "description": ""
+    },
+    {
+      "id": "bp3",
+      "title": "",
+      "description": ""
+    },
+    {
+      "id": "bp4",
+      "title": "",
+      "description": ""
+    }
+  ],
+  "targetJD": {
+    "title": "",
+    "summary": "",
+    "responsibilities": [],
+    "requirements": []
+  },
+  "projects": []
+}

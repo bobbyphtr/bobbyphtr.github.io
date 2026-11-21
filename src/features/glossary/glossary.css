@@ -1,0 +1,294 @@
+/* Glossary — view styles. Tokens, layout and shared components live in shared/app-kit/ui.css. */
+
+.stat-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.stat {
+  flex: 1 1 110px;
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.stat strong {
+  display: block;
+  font: 650 22px var(--mono);
+}
+.stat span {
+  font-size: 12px;
+  color: var(--text-3);
+}
+.review-filter {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Review card ------------------------------------------------------------- */
+.review-card,
+.review-done {
+  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  text-align: center;
+  padding: 28px 20px;
+  position: relative;
+}
+.review-meta {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.hanzi {
+  font-size: clamp(48px, 11vw, 84px);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.15;
+  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", var(--font);
+  overflow-wrap: anywhere;
+}
+.answer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+.pinyin {
+  font-size: 22px;
+  font-weight: 550;
+  color: var(--accent);
+}
+.meaning {
+  font-size: 17px;
+  color: var(--text-2);
+  max-width: 520px;
+}
+.show-btn {
+  min-height: 46px;
+  padding: 10px 26px;
+  font-size: 15px;
+}
+kbd {
+  font: 11px var(--mono);
+  padding: 1px 6px;
+  border-radius: 5px;
+  border: 1px solid currentColor;
+  opacity: 0.6;
+}
+.rate-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: min(520px, 100%);
+}
+.rate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 10px 6px;
+  border-radius: 12px;
+  border: 1px solid var(--r);
+  background: color-mix(in srgb, var(--r) 10%, var(--surface));
+  color: var(--r);
+  cursor: pointer;
+}
+.rate:hover {
+  background: color-mix(in srgb, var(--r) 18%, var(--surface));
+}
+.rate-again { --r: var(--danger); }
+.rate-hard { --r: var(--amber); }
+.rate-good { --r: var(--emerald); }
+.rate-easy { --r: var(--accent); }
+.rate-label {
+  font-weight: 650;
+  font-size: 14px;
+}
+.rate-int {
+  font-size: 12px;
+  color: var(--text-2);
+}
+.done-mark {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  background: var(--emerald-soft);
+  color: var(--emerald);
+}
+.review-done h2 {
+  font-size: 20px;
+}
+.review-done p {
+  color: var(--text-2);
+  max-width: 440px;
+}
+
+/* Word list --------------------------------------------------------------- */
+.list-count {
+  font-size: 12.5px;
+  margin-bottom: 6px;
+}
+.word-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.6fr) minmax(0, 1fr) auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.word-row:first-of-type {
+  border-top: 0;
+}
+.w-head {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.w-word {
+  font-size: 19px;
+  font-weight: 600;
+  font-family: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", var(--font);
+  padding: 0 4px;
+}
+.w-pinyin {
+  font-size: 13px;
+  color: var(--accent);
+  padding: 0 4px;
+}
+.w-meaning {
+  font-size: 14px;
+  padding: 1px 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.w-tags {
+  font-size: 12.5px;
+  color: var(--text-3);
+  padding: 1px 4px;
+  min-width: 0;
+}
+.w-tags:empty::before {
+  content: "add tags";
+  opacity: 0.6;
+}
+.w-due {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Import ------------------------------------------------------------------ */
+.paste {
+  font: 13px/1.5 var(--mono);
+}
+.prompt summary {
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--accent);
+  font-weight: 550;
+}
+.prompt pre {
+  margin: 10px 0 0;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font: 12.5px/1.5 var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.preview-table {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.preview-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.preview-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 10px 8px 0;
+}
+.preview-table td {
+  padding: 7px 10px 7px 0;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+}
+.w-word-sm {
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.skipped {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--amber);
+}
+
+/* Responsive -------------------------------------------------------------- */
+@media (max-width: 720px) {
+  .word-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "head due x"
+      "meaning meaning meaning"
+      "tags tags tags";
+    row-gap: 4px;
+  }
+  .w-head { grid-area: head; }
+  .w-meaning { grid-area: meaning; }
+  .w-tags { grid-area: tags; }
+  .w-due { grid-area: due; }
+  .word-row .x-btn { grid-area: x; }
+  .preview-table thead {
+    display: none;
+  }
+  .preview-table tr {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 2px 10px;
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
+  }
+  .preview-table td {
+    border: 0;
+    padding: 0;
+  }
+  .preview-table td:nth-child(3),
+  .preview-table td:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+}
+@media (max-width: 480px) {
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .rate-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .review-card,
+  .review-done {
+    min-height: 320px;
+  }
+}
