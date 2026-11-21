@@ -94,8 +94,11 @@ function download(filename, text, type) {
 
 // ------------------------------------------------------------------ binding
 // Paths: "identity.title", "projects.#p1.tasks.#t2.done" ("#id" finds by id in an array).
+// IDs come from imported/synced data, so refuse paths that would reach Object.prototype.
+const UNSAFE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
 function resolvePath(root, path) {
   const segs = path.split(".");
+  if (segs.some((s) => UNSAFE_KEYS.has(s))) return [null, null];
   let obj = root;
   for (let i = 0; i < segs.length - 1; i++) {
     const s = segs[i];
@@ -106,6 +109,18 @@ function resolvePath(root, path) {
 }
 const getPath = (root, path) => { const [o, k] = resolvePath(root, path); return o ? o[k] : undefined; };
 const setPath = (root, path, v) => { const [o, k] = resolvePath(root, path); if (o) o[k] = v; };
+// IDs end up inside those dotted paths, so imported/synced lists get their objects kept and
+// any missing, malformed (e.g. containing ".") or duplicate ID replaced with a fresh one.
+const isObj = (x) => x !== null && typeof x === "object" && !Array.isArray(x);
+function cleanList(list, prefix, keep = isObj) {
+  const seen = new Set();
+  const out = (Array.isArray(list) ? list : []).filter(keep);
+  for (const item of out) {
+    if (typeof item.id !== "string" || !/^[\w-]+$/.test(item.id) || seen.has(item.id)) item.id = uid(prefix);
+    seen.add(item.id);
+  }
+  return out;
+}
 const findById = (list, id) => list.find((x) => x.id === id);
 const removeById = (list, id) => { const i = list.findIndex((x) => x.id === id); if (i >= 0) list.splice(i, 1); };
 

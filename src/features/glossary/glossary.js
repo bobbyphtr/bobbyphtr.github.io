@@ -43,8 +43,8 @@ function validate(obj) {
 function normalize(obj) {
   const out = { ...clone(DEFAULT_STATE), ...obj };
   out.stats = { day: "", newSeen: 0, ...(obj.stats || {}) };
-  out.words = obj.words.map((w) => ({
-    id: w.id || uid("g"),
+  out.words = cleanList(obj.words.map((w) => ({
+    id: w.id,
     word: w.word,
     pinyin: w.pinyin || "",
     type: w.type || "",
@@ -52,7 +52,7 @@ function normalize(obj) {
     tags: Array.isArray(w.tags) ? w.tags : [],
     srs: w.srs && typeof w.srs === "object" ? w.srs : null,
     added: w.added || today(),
-  }));
+  })), "g");
   return out;
 }
 

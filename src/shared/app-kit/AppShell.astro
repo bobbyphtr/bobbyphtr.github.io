@@ -28,7 +28,10 @@ const favicon =
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0f172a"/><text x="16" y="22" font-size="16" text-anchor="middle" fill="#F59E0B" font-family="sans-serif">${mark}</text></svg>`,
   );
-const themeBoot = `try{var t=localStorage.getItem('bobby_career_compass_theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}`;
+// Runs first: hide the app if another site frames it (a <meta> CSP can't set frame-ancestors,
+// and GitHub Pages sends no X-Frame-Options), then apply the saved theme.
+// The page's CSP is added at build time by src/shared/csp-integration.mjs.
+const themeBoot = `if(window.top!==window.self)document.documentElement.style.display='none';try{var t=localStorage.getItem('bobby_career_compass_theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}`;
 ---
 
 <!doctype html>

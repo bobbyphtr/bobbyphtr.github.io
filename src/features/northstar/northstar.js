@@ -17,6 +17,13 @@ const PILLARS = [
 ];
 const EMPTY_FILTER = { name: "", gold: false, silver: false, leverage: false, trap: false };
 
+// Links can arrive from imported or synced files, so only http(s) URLs become clickable.
+const isWebUrl = (u) => /^https?:\/\//i.test(String(u || ""));
+// Snapshot links: escape the link text and percent-encode characters that could end the URL,
+// so a crafted label or URL can't smuggle a second (e.g. javascript:) link into the Markdown.
+const mdText = (s) => String(s).replace(/[\\[\]]/g, "\\$&").replace(/\s*\n\s*/g, " ");
+const mdUrl = (u) => u.replace(/[()<>\s]/g, (c) => "%" + c.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0"));
+const mdCode = (s) => "`" + String(s).replace(/[`\r\n]+/g, " ") + "`";
 const cap = (s) => (s ? s[0].toUpperCase() + s.slice(1) : "");
 const fmtDay = (d) => {
   const [y, m, day] = String(d).split("-").map(Number);
@@ -41,11 +48,17 @@ function normalize(obj) {
   const out = { ...base, ...obj };
   out.identity = { ...base.identity, ...(obj.identity || {}) };
   out.targetJD = { ...base.targetJD, ...(obj.targetJD || {}) };
+  out.pillars = cleanList(out.pillars, "pl");
+  out.buildPillars = cleanList(out.buildPillars, "bp");
+  out.projects = cleanList(out.projects, "p");
   for (const p of out.projects) {
-    p.links = Array.isArray(p.links) ? p.links : [];
+    p.tasks = cleanList(p.tasks, "t");
+    p.links = cleanList(p.links, "l", (l) => isObj(l) && typeof l.url === "string");
     p.notes = p.notes || "";
     p.due = p.due || "";
   }
+  out.targetJD.responsibilities = cleanList(out.targetJD.responsibilities, "jr");
+  out.targetJD.requirements = cleanList(out.targetJD.requirements, "rq");
   for (const r of out.targetJD.requirements) r.projectIds = Array.isArray(r.projectIds) ? r.projectIds : [];
   return out;
 }
@@ -420,7 +433,9 @@ function projectDialogHtml(p) {
   <section class="pd-section">
     <div class="pd-sub"><h3>Links</h3></div>
     ${p.links.length ? `<ul class="links">${p.links.map((l) => `
-      <li><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label || l.url)}</a>
+      <li>${isWebUrl(l.url)
+        ? `<a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.label || l.url)}</a>`
+        : `<span title="Not a web link, so it isn't clickable">${esc(l.label || l.url)}</span>`}
       <span class="muted mono link-url">${esc(l.url.replace(/^https?:\/\//, ""))}</span>
       <button type="button" class="x-btn" data-action="delete-link" data-id="${esc(l.id)}" aria-label="Remove link">×</button></li>`).join("")}</ul>` : ""}
     <form class="form-row" data-form="link">
@@ -494,7 +509,10 @@ function buildMarkdown() {
       const d = p.tasks.filter((x) => x.done).length;
       L.push(`#### ${p.title}${p.pillar ? ` · ${cap(p.pillar)}` : ""} — ${d}/${p.tasks.length}${p.due ? ` · due ${p.due}` : ""}`);
       for (const x of p.tasks) L.push(`- [${x.done ? "x" : " "}] ${x.text}`);
-      for (const l of p.links) L.push(`- 🔗 [${l.label || l.url}](${l.url})`);
+      for (const l of p.links) {
+        const text = mdText(l.label || l.url);
+        L.push(isWebUrl(l.url) ? `- 🔗 [${text}](${mdUrl(l.url)})` : `- 🔗 ${text}: ${mdCode(l.url)}`);
+      }
       L.push("");
     }
   }
@@ -610,7 +628,7 @@ const FORMS = {
   },
   link: (fd) => {
     let url = fd.get("url").trim();
-    if (!/^https?:\/\//i.test(url)) url = "https://" + url;
+    if (!isWebUrl(url)) url = "https://" + url;
     try { new URL(url); } catch (e) { toast("That doesn't look like a valid URL.", true); return; }
     findById(S().projects, ui.openProject).links.push({ id: uid("l"), label: fd.get("label").trim(), url });
     commit();
