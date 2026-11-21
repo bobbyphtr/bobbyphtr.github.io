@@ -8,8 +8,8 @@ A personal Mandarin word bank with pinyin and spaced-repetition review, for clin
 
 | View | What it's for |
 | --- | --- |
-| **Review** | Today's queue: words that are due, plus up to **15 new words per day**. You see the 漢字 and try to recall the pinyin and meaning, then press **Show answer** (Space) and rate yourself **Again / Hard / Good / Easy** (keys 1–4). Each button shows when you'll see the word next. A tag filter lets you review one topic, e.g. *Clinical*. |
-| **Words** | Search, filter by tag, edit any field inline (tags are comma-separated), see each word's next review, delete, or add one word by hand. |
+| **Review** | Today's queue: words that are due, plus up to **15 new words per day**. You see the 漢字 and try to recall the pinyin and meaning, then press **Show answer** (Space) to see the pinyin, type (noun / verb / both) and meaning, and rate yourself **Again / Hard / Good / Easy** (keys 1–4). Each button shows when you'll see the word next. A tag filter lets you review one topic, e.g. *Clinical*. |
+| **Words** | Search, filter by tag, edit any field inline (tags are comma-separated; type is free text such as *noun*, *verb* or *noun, verb*), see each word's next review, delete, or add one word by hand. |
 | **Import** | Paste a markdown table to add many words at once. |
 
 ## Adding words with an AI tool
@@ -18,18 +18,18 @@ A personal Mandarin word bank with pinyin and spaced-repetition review, for clin
 2. Paste the table it returns into the Import box. The expected format:
 
    ```markdown
-   | Word | Pinyin | Meaning | Tags |
-   | --- | --- | --- | --- |
-   | 轉診 | zhuǎnzhěn | Referral | Clinical |
-   | 檢傷分類 | jiǎnshāng fēnlèi | Triage | Clinical, Emergency |
+   | Word | Pinyin | Type | Meaning | Tags |
+   | --- | --- | --- | --- | --- |
+   | 轉診 | zhuǎnzhěn | noun, verb | Referral; to refer a patient | Clinical |
+   | 檢傷分類 | jiǎnshāng fēnlèi | noun | Triage | Clinical, Emergency |
    ```
 
 3. Check the preview, which labels each row **new / updated / unchanged** and lists any skipped lines with the reason. Then press **Import**.
 
 Import details:
-- Header names are matched loosely (e.g. *Term*, *漢字*, *English*, *Definition*, *Topic*). Text before or after the table is ignored.
-- If a table has no recognised header, columns are read in order: Word, Pinyin, Meaning, Tags.
-- A word that already exists is **updated in place**, so it keeps its review history.
+- Header names are matched loosely (e.g. *Term*, *漢字*, *POS*, *Part of speech*, *詞性*, *English*, *Definition*, *Topic*). The Type column is optional, so older 4-column tables still import. Text before or after the table is ignored.
+- If a table has no recognised header, columns are read in order: Word, Pinyin, Type, Meaning, Tags (or Word, Pinyin, Meaning, Tags for a 4-column table).
+- A word that already exists is **updated in place**, so it keeps its review history. To add types to words you already have, re-import them with a Type column.
 
 ## How review scheduling works
 

@@ -4,6 +4,7 @@
 const DEFAULT_STATE = JSON.parse($("#default-state").textContent);
 const VIEWS = { review: "Review", words: "Words", import: "Import" };
 const NEW_PER_DAY = 15;
+const TYPES = ["noun", "verb", "noun, verb", "adjective", "adverb", "measure word", "phrase"];
 const RATINGS = [
   { id: "again", label: "Again", key: "1" },
   { id: "hard", label: "Hard", key: "2" },
@@ -13,11 +14,12 @@ const RATINGS = [
 const AI_PROMPT = `Create a Mandarin vocabulary table for: [TOPIC, OR PASTE THE TEXT / NOTES HERE]
 
 Return ONLY a markdown table with exactly these columns:
-| Word | Pinyin | Meaning | Tags |
+| Word | Pinyin | Type | Meaning | Tags |
 
 Rules:
 - Word: Traditional Chinese characters, as used in Taiwan.
 - Pinyin: tone marks (e.g. bìnglì), syllables of one word written together.
+- Type: part of speech — noun, verb, adjective, adverb, measure word or phrase. If the word works as more than one, list them, e.g. "noun, verb".
 - Meaning: concise English meaning; add short usage context in parentheses when helpful.
 - Tags: 1–3 comma-separated topics, e.g. Clinical, Public Health, Engineering, Privacy & UX, Daily life.
 - One word or phrase per row, no duplicates, no commentary before or after the table.`;
@@ -45,6 +47,7 @@ function normalize(obj) {
     id: w.id || uid("g"),
     word: w.word,
     pinyin: w.pinyin || "",
+    type: w.type || "",
     meaning: w.meaning || "",
     tags: Array.isArray(w.tags) ? w.tags : [],
     srs: w.srs && typeof w.srs === "object" ? w.srs : null,
@@ -136,6 +139,7 @@ function rate(rating) {
 const HEADER_MATCHERS = {
   word: ["word", "term", "詞", "詞彙", "漢字", "汉字", "中文", "character", "chinese", "hanzi", "traditional"],
   pinyin: ["pinyin", "拼音"],
+  type: ["type", "pos", "part of speech", "word class", "class", "詞性"],
   meaning: ["meaning", "english", "definition", "translation", "gloss", "意思", "英文"],
   tags: ["tag", "topic", "category", "categories", "標籤"],
 };
@@ -169,10 +173,11 @@ function parseTable(text) {
     if (!cols) {
       cols = mapHeader(cells);
       if (cols) return;
-      cols = { word: 0, pinyin: 1, meaning: 2, tags: 3 };
+      // No recognised header: read by position (5 columns = Word, Pinyin, Type, Meaning, Tags).
+      cols = cells.length >= 5 ? { word: 0, pinyin: 1, type: 2, meaning: 3, tags: 4 } : { word: 0, pinyin: 1, meaning: 2, tags: 3 };
     }
     const get = (f) => (cols[f] !== undefined ? cells[cols[f]] || "" : "");
-    const row = { word: get("word"), pinyin: get("pinyin"), meaning: get("meaning"), tags: splitTags(get("tags")) };
+    const row = { word: get("word"), pinyin: get("pinyin"), type: get("type").toLowerCase(), meaning: get("meaning"), tags: splitTags(get("tags")) };
     if (!row.word) return skipped.push({ line: i + 1, reason: "missing word" });
     if (!/\p{Script=Han}/u.test(row.word)) return skipped.push({ line: i + 1, reason: `"${row.word}" has no Chinese characters` });
     if (!row.meaning) return skipped.push({ line: i + 1, reason: `"${row.word}" has no meaning` });
@@ -185,7 +190,7 @@ function parseTable(text) {
     let status = "new";
     if (existing) {
       const same = existing.pinyin === r.pinyin && existing.meaning === r.meaning &&
-        (!r.tags.length || existing.tags.join(",") === r.tags.join(","));
+        (!r.type || existing.type === r.type) && (!r.tags.length || existing.tags.join(",") === r.tags.join(","));
       status = same ? "unchanged" : "update";
     }
     return { ...r, status };
@@ -201,10 +206,11 @@ function importRows(rows) {
       if (r.status !== "update") continue;
       existing.pinyin = r.pinyin;
       existing.meaning = r.meaning;
+      if (r.type) existing.type = r.type;
       if (r.tags.length) existing.tags = r.tags;
       updated++;
     } else {
-      S().words.push({ id: uid("g"), word: r.word, pinyin: r.pinyin, meaning: r.meaning, tags: r.tags, srs: null, added: today() });
+      S().words.push({ id: uid("g"), word: r.word, pinyin: r.pinyin, type: r.type, meaning: r.meaning, tags: r.tags, srs: null, added: today() });
       added++;
     }
   }
@@ -257,6 +263,7 @@ function viewReview() {
       ${ui.revealed ? `
         <div class="answer">
           <div class="pinyin">${esc(current.pinyin)}</div>
+          ${current.type ? `<div class="w-type-tag">${esc(current.type)}</div>` : ""}
           <div class="meaning">${esc(current.meaning)}</div>
           <div class="chips" style="justify-content:center">${tagBadges(current.tags)}</div>
         </div>
@@ -306,6 +313,8 @@ function viewWords() {
   <form class="card form-row" data-form="word">
     <label class="field" style="flex:1 1 120px"><span>Word</span><input class="input" name="word" required placeholder="轉診" lang="zh-Hant" autocomplete="off"></label>
     <label class="field" style="flex:1 1 120px"><span>Pinyin</span><input class="input" name="pinyin" placeholder="zhuǎnzhěn" autocomplete="off"></label>
+    <label class="field" style="flex:1 1 120px"><span>Type</span><input class="input" name="type" placeholder="noun" list="type-list" autocomplete="off"></label>
+    <datalist id="type-list">${TYPES.map((t) => `<option value="${t}">`).join("")}</datalist>
     <label class="field"><span>Meaning</span><input class="input" name="meaning" required placeholder="Referral" autocomplete="off"></label>
     <label class="field" style="flex:1 1 140px"><span>Tags</span><input class="input" name="tags" placeholder="Clinical" list="tag-list" autocomplete="off"></label>
     <datalist id="tag-list">${tags.map((t) => `<option value="${esc(t)}">`).join("")}</datalist>
@@ -329,6 +338,7 @@ function wordListHtml() {
       <div class="w-head">
         ${editable(`words.#${w.id}.word`, "w-word", "zh-Hant")}
         ${editable(`words.#${w.id}.pinyin`, "w-pinyin")}
+        ${editable(`words.#${w.id}.type`, "w-type")}
       </div>
       ${editable(`words.#${w.id}.meaning`, "w-meaning")}
       ${tagsEditable(w)}
@@ -344,7 +354,7 @@ function viewImport() {
     <div class="card-head" style="margin-bottom:0">
       <div>
         <h2 class="card-title">Paste a markdown table</h2>
-        <p class="muted" style="font-size:13.5px;margin-top:2px">Columns: Word | Pinyin | Meaning | Tags. Existing words are updated and keep their review history.</p>
+        <p class="muted" style="font-size:13.5px;margin-top:2px">Columns: Word | Pinyin | Type | Meaning | Tags. Existing words are updated and keep their review history.</p>
       </div>
       <button type="button" class="btn btn-ghost" data-action="copy-prompt">Copy AI prompt</button>
     </div>
@@ -353,9 +363,9 @@ function viewImport() {
       <pre id="ai-prompt">${esc(AI_PROMPT)}</pre>
     </details>
     <label class="sr-only" for="paste">Markdown table</label>
-    <textarea class="textarea paste" id="paste" data-ui="paste" rows="9" spellcheck="false" placeholder="| Word | Pinyin | Meaning | Tags |
-| --- | --- | --- | --- |
-| 轉診 | zhuǎnzhěn | Referral | Clinical |">${esc(ui.paste)}</textarea>
+    <textarea class="textarea paste" id="paste" data-ui="paste" rows="9" spellcheck="false" placeholder="| Word | Pinyin | Type | Meaning | Tags |
+| --- | --- | --- | --- | --- |
+| 轉診 | zhuǎnzhěn | noun, verb | Referral; to refer a patient | Clinical |">${esc(ui.paste)}</textarea>
   </section>
   <div id="import-preview">${previewHtml()}</div>`;
 }
@@ -377,9 +387,9 @@ function previewHtml() {
       <button type="button" class="btn btn-primary" data-action="do-import" ${actionable ? "" : "disabled"}>Import ${actionable} word${actionable === 1 ? "" : "s"}</button>
     </div>
     ${rows.length ? `<div class="preview-table"><table>
-      <thead><tr><th>Word</th><th>Pinyin</th><th>Meaning</th><th>Tags</th><th></th></tr></thead>
+      <thead><tr><th>Word</th><th>Pinyin</th><th>Type</th><th>Meaning</th><th>Tags</th><th></th></tr></thead>
       <tbody>${rows.map((r) => `<tr>
-        <td lang="zh-Hant" class="w-word-sm">${esc(r.word)}</td><td>${esc(r.pinyin)}</td><td>${esc(r.meaning)}</td>
+        <td lang="zh-Hant" class="w-word-sm">${esc(r.word)}</td><td>${esc(r.pinyin)}</td><td class="muted">${esc(r.type)}</td><td>${esc(r.meaning)}</td>
         <td>${esc(r.tags.join(", "))}</td>
         <td><span class="badge ${r.status === "new" ? "badge-emerald" : r.status === "update" ? "badge-accent" : ""}">${r.status}</span></td>
       </tr>`).join("")}</tbody></table></div>` : '<p class="muted">No table rows found yet.</p>'}
@@ -449,7 +459,7 @@ const FORMS = {
   word: (fd) => {
     const word = fd.get("word").trim();
     if (S().words.some((w) => w.word === word)) { toast(`${word} is already in your glossary`, true); return; }
-    S().words.push({ id: uid("g"), word, pinyin: fd.get("pinyin").trim(), meaning: fd.get("meaning").trim(), tags: splitTags(fd.get("tags")), srs: null, added: today() });
+    S().words.push({ id: uid("g"), word, pinyin: fd.get("pinyin").trim(), type: fd.get("type").trim().toLowerCase(), meaning: fd.get("meaning").trim(), tags: splitTags(fd.get("tags")), srs: null, added: today() });
     store.save();
     render();
     $('[data-form="word"] [name="word"]')?.focus();

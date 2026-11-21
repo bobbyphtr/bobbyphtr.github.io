@@ -69,6 +69,11 @@
   font-weight: 550;
   color: var(--accent);
 }
+.w-type-tag {
+  font-size: 13px;
+  font-style: italic;
+  color: var(--text-3);
+}
 .meaning {
   font-size: 17px;
   color: var(--text-2);
@@ -168,6 +173,16 @@ kbd {
   font-size: 13px;
   color: var(--accent);
   padding: 0 4px;
+}
+.w-type {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--text-3);
+  padding: 0 4px;
+}
+.w-type:empty::before {
+  content: "add type";
+  opacity: 0.6;
 }
 .w-meaning {
   font-size: 14px;
@@ -274,8 +289,8 @@ kbd {
     border: 0;
     padding: 0;
   }
-  .preview-table td:nth-child(3),
-  .preview-table td:nth-child(4) {
+  .preview-table td:nth-child(4),
+  .preview-table td:nth-child(5) {
     grid-column: 1 / -1;
   }
 }
