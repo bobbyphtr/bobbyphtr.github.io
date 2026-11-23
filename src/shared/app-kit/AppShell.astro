@@ -47,6 +47,16 @@ const themeBoot = `if(window.top!==window.self)document.documentElement.style.di
     <style is:inline set:html={kitCss + "\n" + css}></style>
   </head>
   <body>
+    <main class="lock">
+      <form class="lock-card" id="unlock-form" autocomplete="off">
+        <span class="brand-mark lock-mark" aria-hidden="true">{mark}</span>
+        <h1>{appName}</h1>
+        <p class="muted">{appSub}</p>
+        <label class="field"><span>GitHub fine-grained token</span><input class="input" name="token" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" required /></label>
+        <p class="sync-result" id="unlock-result" aria-live="polite"></p>
+        <button class="btn btn-primary" type="submit">Unlock</button>
+      </form>
+    </main>
     <div class="app">
       <aside class="sidebar" id="sidebar" aria-label="Navigation">
         <div class="brand">

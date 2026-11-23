@@ -154,6 +154,48 @@ code {
   white-space: nowrap;
 }
 
+/* Lock ------------------------------------------------------------------ */
+/* Nothing shows until kit.js checks access to the data repo: then .unlocked
+   shows the app, .locked shows the landing page with the token field. */
+html:not(.unlocked) .app {
+  display: none;
+}
+.lock {
+  display: none;
+}
+html.locked .lock {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+.lock-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 360px;
+  padding: 28px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.lock-card h1 {
+  font-size: 22px;
+}
+.lock-card .muted {
+  margin-top: -10px;
+}
+.lock-card .sync-result:empty {
+  display: none;
+}
+.lock-mark {
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+}
+
 /* Layout ---------------------------------------------------------------- */
 .app {
   min-height: 100vh;

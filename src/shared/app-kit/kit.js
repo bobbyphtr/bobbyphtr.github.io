@@ -6,6 +6,9 @@
 const THEME_KEY = "bobby_career_compass_theme";
 const SYNC_CONFIG_KEY = "bobby_sync_config";
 const SYNC_PUSH_DELAY = 10000;
+// The apps only open on a device whose sync token can reach this repo; elsewhere they show a
+// landing page that asks for the token.
+const DATA_REPO = "bobbyphtr/northstar-data";
 
 // ------------------------------------------------------------------ utils
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -176,6 +179,16 @@ async function gh(cfg, path, init = {}) {
 }
 
 const contentsPath = (cfg, file) => `/contents/${encodeURIComponent(file)}`;
+
+// ------------------------------------------------------------------ lock
+async function hasAccess() {
+  const cfg = getSyncConfig();
+  if (!cfg || cfg.repo.toLowerCase() !== DATA_REPO) return false;
+  try { await gh(cfg, ""); return true; }
+  catch (e) { return e.status === 0; } // offline: this device is set up, so open with local data
+}
+
+let checkLock = () => {}; // set by wireShell
 
 async function testSyncConnection(cfg) {
   const repo = await gh(cfg, "");
@@ -397,6 +410,7 @@ async function handleSyncAction(action, store) {
     const cfg = readSyncForm();
     if (!/^[\w.-]+\/[\w.-]+$/.test(cfg.repo)) { result.textContent = "Repository must look like owner/name."; return; }
     if (!cfg.token) { result.textContent = "Paste a fine-grained token first."; return; }
+    if (cfg.repo.toLowerCase() !== DATA_REPO) { result.textContent = "Couldn't connect: repository not found, or the token can't access it."; return; }
     result.textContent = "Checking…";
     try {
       const msg = await testSyncConnection(cfg);
@@ -406,6 +420,7 @@ async function handleSyncAction(action, store) {
         $("#sync-modal").close();
         toast("Sync turned on");
         store.sync();
+        checkLock();
       }
     } catch (e) {
       result.textContent = "Couldn't connect: " + e.message;
@@ -415,6 +430,7 @@ async function handleSyncAction(action, store) {
     $("#sync-modal").close();
     store.renderStatus();
     toast("Sync turned off — token removed from this browser");
+    checkLock();
   } else if (action === "sync-now") {
     if (!getSyncConfig()) { openSyncDialog(store); return; }
     await store.sync();
@@ -441,24 +457,57 @@ function wireShell(store, onRoute) {
     if (file) store.importFile(file);
   });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeNav(); });
-  window.addEventListener("hashchange", onRoute);
 
-  // Sync triggers: load, focus, back online, page hidden.
-  let lastFocusSync = 0;
-  const maybeSync = () => {
-    if (!getSyncConfig() || Date.now() - lastFocusSync < 30000) return;
-    lastFocusSync = Date.now();
-    store.sync();
+  // Everything below runs only once the page is unlocked.
+  const root = document.documentElement;
+  let started = false;
+  checkLock = async () => {
+    const ok = await hasAccess();
+    root.classList.toggle("unlocked", ok);
+    root.classList.toggle("locked", !ok);
+    if (ok && !started) { started = true; start(); }
   };
-  window.addEventListener("focus", maybeSync);
-  window.addEventListener("online", () => store.sync());
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden" && getSyncConfig() && store.dirty) store.sync();
-    else if (document.visibilityState === "visible") maybeSync();
+  $("#unlock-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const form = e.target, result = $("#unlock-result");
+    const cfg = { repo: DATA_REPO, branch: "main", token: form.token.value.trim() };
+    if (!cfg.token) return;
+    form.querySelector("button").disabled = true;
+    result.textContent = "Checking…";
+    try {
+      await gh(cfg, "");
+      storageSet(SYNC_CONFIG_KEY, JSON.stringify(cfg));
+      form.reset();
+      result.textContent = "";
+      await checkLock();
+    } catch (err) {
+      result.textContent = err.status === 0 ? "You're offline. Connect and try again." : "That token can't access the data repo.";
+    } finally {
+      form.querySelector("button").disabled = false;
+    }
   });
+  checkLock();
 
-  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
-  store.renderStatus();
-  onRoute();
-  if (getSyncConfig()) { lastFocusSync = Date.now(); store.sync(); }
+  function start() {
+    window.addEventListener("hashchange", onRoute);
+
+    // Sync triggers: load, focus, back online, page hidden.
+    let lastFocusSync = 0;
+    const maybeSync = () => {
+      if (!getSyncConfig() || Date.now() - lastFocusSync < 30000) return;
+      lastFocusSync = Date.now();
+      store.sync();
+    };
+    window.addEventListener("focus", maybeSync);
+    window.addEventListener("online", () => store.sync());
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden" && getSyncConfig() && store.dirty) store.sync();
+      else if (document.visibilityState === "visible") maybeSync();
+    });
+
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+    store.renderStatus();
+    onRoute();
+    if (getSyncConfig()) { lastFocusSync = Date.now(); store.sync(); }
+  }
 }

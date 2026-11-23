@@ -55,7 +55,6 @@ src/
   pages/
     index.astro                       # → features/portfolio/PortfolioPage.astro
     northstar/index.astro             # → features/northstar/NorthstarApp.astro
-    northstar/default-state.json.ts   # publishes the North Star blueprint JSON
     glossary/index.astro              # → features/glossary/GlossaryApp.astro
   features/
     portfolio/                        # the main site (/)

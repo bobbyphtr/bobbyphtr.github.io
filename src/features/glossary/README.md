@@ -48,8 +48,8 @@ A word counts as **learned** once its interval reaches 21 days.
 
 Data is saved to this browser's `localStorage` (key `bobby_glossary_v1`). The sidebar has Export/Import JSON (`glossary-backup-YYYY-MM-DD.json`).
 
-To keep your iPhone and Mac in step, use **Sync settings…**. It's the same private-repo setup as North Star (the file is `glossary.json`). See [North Star → Sync with GitHub](../northstar/README.md#sync-with-github).
+To keep your iPhone and Mac in step, use **Sync settings…**. It's the same private-repo setup as North Star (the file is `glossary.json`). See [North Star → Sync with GitHub](../northstar/README.md#sync-with-github). The page is locked the same way: see [North Star → Lock](../northstar/README.md#lock).
 
 ## Files
 
-`GlossaryApp.astro` (page config), `glossary.css`, `glossary.js`, `default-state.json` (the six starter words). The shell, shared UI and sync come from `src/shared/app-kit/`. The build output `dist/glossary/index.html` is self-contained and works offline.
+`GlossaryApp.astro` (page config), `glossary.css`, `glossary.js`, `default-state.json` (starts empty). The shell, shared UI and sync come from `src/shared/app-kit/`. The build output `dist/glossary/index.html` is self-contained and works offline.

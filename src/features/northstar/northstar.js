@@ -101,14 +101,22 @@ function taskTotals(projects = S().projects) {
   return { done, total };
 }
 
+// Pillar wording for the decision filter comes from the user's own data, so the page ships none.
+function pillarInfo(id) {
+  const p = findById(S().pillars, id) || {};
+  const title = String(p.title || "").trim();
+  return { title, weight: Number(p.weight) || 0, name: title || `the ${cap(id)} pillar` };
+}
+
 function verdictFor(f) {
+  const gold = pillarInfo("gold"), silver = pillarInfo("silver"), bronze = pillarInfo("bronze");
   const reasons = [];
   let tier;
   if (f.gold && (f.silver || f.leverage)) tier = 0;
   else if (f.gold || f.silver || f.leverage) tier = 1;
   else tier = 2;
-  if (f.gold) reasons.push("Compounds the Gold pillar.");
-  if (f.silver) reasons.push("Strengthens the Silver backbone.");
+  if (f.gold) reasons.push(`Compounds the Gold pillar${gold.title ? ` — ${gold.title}` : ""} (${gold.weight}%).`);
+  if (f.silver) reasons.push(`Strengthens the Silver backbone${silver.title ? ` — ${silver.title}` : ""} (${silver.weight}%).`);
   if (f.leverage) reasons.push("Builds on your existing experience instead of resetting it.");
   if (f.silver && f.leverage && !f.gold) reasons.push("Silver + core leverage together make strong backbone work — keep it scoped to what your projects need.");
   if (!f.gold && !f.silver && !f.leverage) reasons.push("Touches none of the Gold, Silver or core-leverage signals.");
@@ -116,11 +124,11 @@ function verdictFor(f) {
   if (f.trap) {
     if (f.gold) {
       tier = Math.min(2, tier + 1);
-      warn = "Trap signal present: lean in on the Gold slice only, and consume the heavy work from specialists (Bronze).";
+      warn = `Trap signal present: lean in on the ${gold.name} slice only, and consume the heavy work from specialists (Bronze).`;
     } else {
       tier = 2;
     }
-    reasons.push("Trap signal — this work sits in the Bronze/outsourced zone.");
+    reasons.push(`Trap signal — ${bronze.title || "this work"} sits in the Bronze/outsourced zone.`);
   }
   const tiers = [
     { key: "lean", label: "High-Priority Lean In", advice: "Give it prime time and ship a portfolio artifact from it." },
@@ -300,14 +308,14 @@ function viewCompass() {
           <input class="input" id="filter-name" data-filter="name" value="${esc(ui.filter.name)}" placeholder="e.g. an elective, paper or side project" autocomplete="off">
         </label>
         ${[
-          ["gold", "Improves the Gold pillar?", "Gold"],
-          ["silver", "Strengthens the Silver pillar?", "Silver"],
+          ["gold", `Improves ${pillarInfo("gold").name}?`, "Gold"],
+          ["silver", `Strengthens ${pillarInfo("silver").name}?`, "Silver"],
           ["leverage", "Builds on your existing experience?", "Core leverage"],
-          ["trap", "Mostly Bronze-pillar work you'd rather consume than author?", "Trap signal"],
+          ["trap", `Mostly ${pillarInfo("bronze").title || "Bronze-pillar"} work you'd rather consume than author?`, "Trap signal"],
         ].map(([k, q, tag]) => `
           <label class="switch${k === "trap" ? " trap" : ""}">
             <input type="checkbox" data-filter="${k}" ${ui.filter[k] ? "checked" : ""}>
-            <span class="switch-text"><strong>${q}</strong><small>${tag}</small></span>
+            <span class="switch-text"><strong>${esc(q)}</strong><small>${tag}</small></span>
           </label>`).join("")}
       </div>
       <div id="verdict">${verdictHtml()}</div>
@@ -579,10 +587,10 @@ const ACTIONS = {
     const notes = [
       "## Decision filter verdict", `**${v.label}** — ${v.advice}`, "",
       "## Signals",
-      `- Gold: ${yn(f.gold)}`,
-      `- Silver: ${yn(f.silver)}`,
+      `- Gold (${pillarInfo("gold").name}): ${yn(f.gold)}`,
+      `- Silver (${pillarInfo("silver").name}): ${yn(f.silver)}`,
       `- Core leverage (existing experience): ${yn(f.leverage)}`,
-      `- Trap signal: ${yn(f.trap)}`, "",
+      `- Trap signal (${pillarInfo("bronze").name}): ${yn(f.trap)}`, "",
       "## Reasoning", ...v.reasons.map((r) => `- ${r}`), ...(v.warn ? ["", v.warn] : []),
     ].join("\n");
     S().projects.push({ id: uid("p"), title: name, pillar: f.gold ? "gold" : f.silver ? "silver" : "", status: "backlog", due: "", notes, links: [], tasks: [] });

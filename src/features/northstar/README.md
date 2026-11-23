@@ -18,7 +18,7 @@ A personal dashboard for a graduate study plan and career direction.
 | --- | --- |
 | `NorthstarApp.astro` | Page config: nav, the North Star–specific dialogs, and the inputs passed to the shared shell. |
 | `northstar.css` / `northstar.js` | View styles and app logic. |
-| `default-state.json` | The starting blueprint and the **single source of truth** for default data. It is embedded in the page and also published at `/northstar/default-state.json`. |
+| `default-state.json` | A blank template embedded in the page. Your real blueprint lives only in `northstar.json` in the data repo, and a new device pulls it after unlocking. |
 
 The shell, shared UI, persistence and GitHub sync live in `src/shared/app-kit/`. The build inlines everything, so `dist/northstar/index.html` is one self-contained file that works offline and via `file://`.
 
@@ -56,4 +56,12 @@ How it behaves:
 
 Push to `main`. `.github/workflows/deploy.yml` builds the Astro site and publishes it to GitHub Pages (repo **Settings → Pages → Source: GitHub Actions**).
 
-The page is marked `noindex`, so search engines won't list it. The blueprint itself is still readable by anyone who has the URL.
+The page is marked `noindex`, so search engines won't list it.
+
+## Lock
+
+North Star and the Glossary only open on a device whose sync token can reach `bobbyphtr/northstar-data` (set in `DATA_REPO` in `src/shared/app-kit/kit.js`). Anywhere else, including a device with no sync set up, the page shows a landing page with one field for the GitHub fine-grained token. If the device is offline but already has a token saved, it opens with its local data.
+
+Paste a token that can access the repo and press **Unlock**: the token is saved as this device's sync setting (branch `main`), so one unlock covers both apps. Turning sync off locks the page again.
+
+GitHub Pages still serves the page itself (HTTP 200), but the page holds only app code and a blank template: your blueprint, projects and words are fetched from the private repo after unlocking and kept in that browser's `localStorage`.
